@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Discount Manager</title>
+    <link rel="stylesheet" href="/css/discount.css">
+</head>
+
+<body>
+    
+    <div style="padding: 20px;">
+
+        <h1>DISCOUNT MANAGER</h1>
+        <button class="custom-btn" onclick="toggleAddForm()" style="margin-bottom: 20px; padding: 8px 15px; background: #4CAF50; color: white; border: none; border-radius: 4px; cursor: pointer;">
+            Add Product
+        </button>
+
+        <div id="add-form" style="display: none;">
+            <div style="background: #f5f5f5; padding: 20px; border-radius: 5px;">
+                <h2>Product Information</h2>
+                <form action="/api/products" method="POST" style="display: grid; grid-template-columns: 120px 1fr; gap: 15px; align-items: center;">
+                    <label style="font-weight: bold;">Title:</label>
+                    <input type="text" name="title" required style="padding: 8px; border: 1px solid #ddd; border-radius: 4px; width: 300px;">
+
+                    <label style="font-weight: bold;">Description:</label>
+                    <textarea name="description" required style="padding: 8px; border: 1px solid #ddd; border-radius: 4px; height: 60px; width: 300px;"></textarea>
+
+                    <label style="font-weight: bold;">Category:</label>
+                    <input type="text" name="category" required style="padding: 8px; border: 1px solid #ddd; border-radius: 4px; width: 300px;">
+
+                    <label style="font-weight: bold;">Price:</label>
+                    <input type="number" name="price" step="0.01" required style="padding: 8px; border: 1px solid #ddd; border-radius: 4px; width: 300px;">
+
+                    <label style="font-weight: bold;">Image URL:</label>
+                    <input type="text" name="image" required style="padding: 8px; border: 1px solid #ddd; border-radius: 4px; width: 300px;">
+
+                    <label style="font-weight: bold;">Discount %:</label>
+                    <input type="number" name="discount" min="0" max="100" value="0" style="padding: 8px; border: 1px solid #ddd; border-radius: 4px; width: 300px;">
+
+                    <label></label>
+                    <div style="grid-column: 2; display: flex; justify-content: flex-start; gap: 10px; margin-top: 15px;">
+                        <button type="button" onclick="toggleAddForm()" style="padding: 8px 15px; background: #f0f0f0; border: 1px solid #ccc; border-radius: 4px; cursor: pointer;">Cancel</button>
+                        <button type="submit" class="custom-btn" style="padding: 8px 15px; background: #4CAF50; color: white; border: none; border-radius: 4px; cursor: pointer;">Save Product</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function toggleAddForm() {
+            const form = document.getElementById('add-form');
+            form.style.display = (form.style.display === 'none' || form.style.display === '') ? 'block' : 'none';
+        }
+    </script>
+        
+
+    <div class="discount-container">
+        <% products.forEach(product=> { %>
+            <div class="product-row">
+                <img src="<%= product.image %>" alt="Product Image" class="product-image">
+
+                <div class="product-details">
+                    <h3 class="product-title">
+                        <%= product.title %>
+                    </h3>
+                    <% if (product.discount > 0) { %>
+                        <p class="product-discount">Discount: <%= product.discount %>%</p>
+                        <p class="product-price">
+                          <s><%= product.price %></s>
+                          <strong>
+                            <%= (product.price * (1 - product.discount / 100)).toFixed(2) %> EGP
+                          </strong>
+                        </p>
+                      <% } else { %>
+                        <p class="product-price"><%= product.price %> EGP</p>
+                      <% } %>
+                    <!-- <p class="product-price">Price: <%= product.price %> EGP</p> -->
+
+                    <div class="discount-input">
+                        <form action="/api/discount" method="post">
+                            <input type="hidden" value="<%= product._id %>" name="id">
+                            <input type="number" placeholder="Discount %" min="0" max="100" name="discount">
+                            <button class="apply-btn" type="submit">Apply</button>
+                        </form>
+                        <form action="/api/discount" method="post">
+                            <input type="hidden" value="<%= product._id %>" name="id">
+                            <button class="remove-btn" type="submit">Remove</button>
+                        </form>
+
+                        <button class="apply-btn" onclick="toggleEditForm('<%= product._id %>')">Edit</button>
+                        <form id="edit-form-<%= product._id %>" action="/api/products/<%= product._id %>?_method=PUT" method="POST" style="display:none;">
+                            <div><input type="text" name="title" value="<%= product.title %>" required></div>
+                            <div><textarea name="description" required><%= product.description %></textarea></div>
+                            <div><input type="text" name="category" value="<%= product.category %>" required></div>
+                            <div><input type="number" name="price" value="<%= product.price %>" required></div>
+                            <div><input type="text" name="image" value="<%= product.image %>" required></div>
+                            <div><input type="number" name="discount" value="<%= product.discount %>" required></div>
+                            <div><button type="submit">Save Changes</button></div>
+                            <div><button type="button" onclick="toggleEditForm('<%= product._id %>')">Cancel</button></div>
+                        </form>
+                        <script>
+                        function toggleEditForm(productId) {
+                            const form = document.getElementById(`edit-form-${productId}`);
+                            form.style.display = form.style.display === 'none' ? 'block' : 'none';
+                        }
+                        </script>
+                        
+                    
+                        <form action="/api/products/<%= product._id %>?_method=DELETE" method="POST">
+                            <button class="remove-btn" type="submit">Delete</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <% }); %>
+    </div>
+</body>
+
+</html>
+
+<!-- 
+<script>
+    function toggleAddForm() {
+        const form = document.getElementById('add-form');
+        form.style.display = (form.style.display === 'none' || form.style.display === '') ? 'block' : 'none';
+    }
+</script> -->
