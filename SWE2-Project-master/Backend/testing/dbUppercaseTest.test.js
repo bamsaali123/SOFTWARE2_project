@@ -22,7 +22,7 @@ afterAll(async () => {
 });
 
 test('convert all product names to uppercase and validate', async () => {
-    const products = await collection.find({}, { projection: { name: 1 } }).toArray();
+    const products = await collection.find({}, { projection: { title: 1 } }).toArray();
   
     for (const product of products) {
       if (product.title) { // Ensure name exists

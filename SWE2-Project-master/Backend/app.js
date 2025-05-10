@@ -6,8 +6,11 @@ app.use(methodOverride('_method'));
 //const rateLimiter = require('./middlewares/rateLimiter');
 //app.use('/api/products', rateLimiter);
 
-//const logger = require('./utils/logger');
-//app.use(logger);
+const rateLimiter = require('./testing/rateLimiter.test');
+app.use('/api/products', rateLimiter);
+
+const logger = require('./utils/logger');
+app.use(logger);
 
 const session = require("express-session");
 const productRoutes = require('./routes/product.route');

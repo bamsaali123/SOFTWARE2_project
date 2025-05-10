@@ -78,9 +78,13 @@ const login = async (req, res) => {
             message: "Invalid email or password",
         });
     }
-
+    
+    
     req.session.user = user;
     res.redirect("/home");
+    
+    
+    
 }
 
 const logout = async (req, res) => {

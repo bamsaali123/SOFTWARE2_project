@@ -1,9 +1,9 @@
 const Product = require("../models/product");
-const { showDiscount, calculateNewPrice } = require('../helpers/discount');
-
+const { showDiscount, calculateNewPrice, getDiscountAmount } = require('../helpers/discount');
+const { convertToUppercase } = require('../helpers/convert')
 const homePage = async (req, res) => {
   if (!req.session.user) {
-    return res.redirect("/auth");    
+    return res.redirect("/auth");
   }
 
   if (req.session.user.isAdmin == true) {
@@ -36,6 +36,9 @@ const discountPage = async (req, res) => {
     products: products,
     showDiscount,
     calculateNewPrice,
+    getDiscountAmount,
+    convertToUppercase 
+
   });
 };
 
@@ -43,5 +46,5 @@ module.exports = {
     homePage,
     authPage,
     discountPage,
-    
+
 }
